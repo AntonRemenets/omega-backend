@@ -73,6 +73,16 @@ export class AuthService {
     }
   }
 
+  public async listOfUsers(): Promise<IResponse> {
+    const users = await this.prisma.user.findMany()
+
+    return {
+      success: true,
+      message: 'Users',
+      data: users,
+    }
+  }
+
   private hashPassword(passwd: string): string {
     const salt = randomBytes(16).toString('hex')
     const hash = scryptSync(passwd, salt, 64).toString('hex')

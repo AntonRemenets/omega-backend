@@ -15,11 +15,12 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid(4))
+  id       String    @id @default(uuid(4))
   name     String
-  email    String   @unique
+  email    String    @unique
   password String
-  role     UserRole @default(user)
+  role     UserRole  @default(user)
+  bookings Booking[]
 
   @@map("users")
 }
@@ -27,4 +28,29 @@ model User {
 enum UserRole {
   admin
   user
+}
+
+// Тестовое задание
+// Котельников Иван Романович
+// Backend NodeJS Developer
+model Event {
+  id         String    @id @default(uuid(4))
+  name       String
+  totalSeats Int       @map("total_seats")
+  bookings   Booking[]
+
+  @@map("events")
+}
+
+model Booking {
+  id        String   @id @default(uuid(4))
+  eventId   String   @map("event_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@map("bookings")
 }
