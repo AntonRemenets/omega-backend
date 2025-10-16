@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { randomBytes, scryptSync } from 'crypto'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
-import { IResponse, ITokenResponse } from '../shared/interfaces'
+import { IJwtPayload, IResponse, ITokenResponse } from '../shared/interfaces'
 import { LoginUserDto } from './dto/login-user.dto'
 import { JwtService } from '@nestjs/jwt'
 
@@ -64,7 +64,7 @@ export class AuthService {
       }
     }
 
-    const payload = { role: user.role }
+    const payload: IJwtPayload = { userId: user.id, role: user.role }
 
     return {
       success: true,
