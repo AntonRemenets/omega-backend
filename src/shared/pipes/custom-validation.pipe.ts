@@ -18,7 +18,6 @@ export class CustomValidationPipe extends ValidationPipe {
 
         // Создаем объект ответа согласно IResponse
         const response: IResponse = {
-          success: false,
           message: 'Bad Request',
           data: errors,
         }

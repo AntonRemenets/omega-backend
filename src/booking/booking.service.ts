@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateEventDto } from './dto/create-event.dto'
 import { IResponse } from '../shared/interfaces'
@@ -21,16 +21,16 @@ export class BookingService {
     })
 
     if (!userCandidate || !eventCandidate) {
-      return {
-        success: false,
-        message: 'Wrong event or user',
-      }
+      throw new HttpException(
+        { message: 'Wrong event or user' },
+        HttpStatus.NOT_FOUND,
+      )
     }
     if (bookingCheck) {
-      return {
-        success: false,
-        message: 'User already booked this event',
-      }
+      throw new HttpException(
+        { message: 'User already booked this event' },
+        HttpStatus.CONFLICT,
+      )
     }
 
     try {
@@ -39,7 +39,6 @@ export class BookingService {
       })
 
       return {
-        success: true,
         message: 'Booking created successfully',
         data: {
           id: booking.id,
@@ -54,11 +53,7 @@ export class BookingService {
         message = e.message
       }
 
-      return {
-        success: false,
-        message,
-        data: message,
-      }
+      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -71,7 +66,6 @@ export class BookingService {
       })
 
       return {
-        success: true,
         message: 'Event created',
         data: { id: newEvent.id, name },
       }
@@ -81,11 +75,7 @@ export class BookingService {
         message = e.message
       }
 
-      return {
-        success: false,
-        message,
-        data: message,
-      }
+      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -94,7 +84,6 @@ export class BookingService {
       const events = await this.prisma.event.findMany()
 
       return {
-        success: true,
         message: 'List of events',
         data: events,
       }
@@ -104,11 +93,7 @@ export class BookingService {
         message = e.message
       }
 
-      return {
-        success: false,
-        message,
-        data: message,
-      }
+      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 }

@@ -9,7 +9,6 @@ export interface IUser {
 }
 
 export interface IResponse {
-  success: boolean
   message: string
   data?: any
 }

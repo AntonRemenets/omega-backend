@@ -9,6 +9,8 @@ async function bootstrap() {
 
   const PORT = config.getOrThrow<number>('API_PORT')
 
+  app.enableCors()
+
   app.setGlobalPrefix('api')
   app.useGlobalPipes(new CustomValidationPipe())
 

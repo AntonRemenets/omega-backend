@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { randomBytes, scryptSync } from 'crypto'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -21,10 +21,10 @@ export class AuthService {
     const count = await this.prisma.user.count()
 
     if (candidate || count > 50) {
-      return {
-        success: false,
-        message: 'User already exists or too many records',
-      }
+      throw new HttpException(
+        { message: 'User already exists or too many records' },
+        HttpStatus.CONFLICT,
+      )
     }
 
     try {
@@ -33,7 +33,6 @@ export class AuthService {
       })
 
       return {
-        success: true,
         message: 'Created',
       }
     } catch (e) {
@@ -42,11 +41,7 @@ export class AuthService {
         message = e.message
       }
 
-      return {
-        success: false,
-        message,
-        data: message,
-      }
+      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -57,19 +52,27 @@ export class AuthService {
     })
 
     if (!user || !this.validatePassword(password, user.password)) {
-      return {
-        success: false,
-        message: 'Wrong email or password',
-        data: { token: null },
-      }
+      throw new HttpException(
+        { message: 'Wrong email or password' },
+        HttpStatus.UNAUTHORIZED,
+      )
     }
 
-    const payload: IJwtPayload = { userId: user.id, role: user.role }
+    try {
+      const payload: IJwtPayload = { userId: user.id, role: user.role }
+      const token = await this.jwt.signAsync(payload)
 
-    return {
-      success: true,
-      message: 'Authentication Successfully',
-      data: { token: await this.jwt.signAsync(payload) },
+      return {
+        message: 'Authentication Successfully',
+        data: { token },
+      }
+    } catch (e) {
+      let message = 'Unknown error'
+      if (e instanceof Error) {
+        message = e.message
+      }
+
+      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -77,7 +80,6 @@ export class AuthService {
     const users = await this.prisma.user.findMany()
 
     return {
-      success: true,
       message: 'Users',
       data: users,
     }
