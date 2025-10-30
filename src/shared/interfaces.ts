@@ -10,6 +10,7 @@ export interface IUser {
 
 export interface IResponse {
   message: string
+  errors?: string[]
   data?: any
 }
 

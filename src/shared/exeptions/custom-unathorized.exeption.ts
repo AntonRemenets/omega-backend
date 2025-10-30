@@ -5,6 +5,7 @@ export class CustomUnauthorizedException extends HttpException {
   constructor(message: string = 'Unauthorized') {
     const response: IResponse = {
       message: message,
+      errors: [message],
     }
     super(response, HttpStatus.UNAUTHORIZED)
   }

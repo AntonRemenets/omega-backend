@@ -21,10 +21,9 @@ export class AuthService {
     const count = await this.prisma.user.count()
 
     if (candidate || count > 50) {
-      throw new HttpException(
-        { message: 'User already exists or too many records' },
-        HttpStatus.CONFLICT,
-      )
+      const message = 'User already exists or too many records'
+
+      throw new HttpException({ message, errors: message }, HttpStatus.CONFLICT)
     }
 
     try {
@@ -41,7 +40,10 @@ export class AuthService {
         message = e.message
       }
 
-      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        { message, errors: message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 
@@ -52,8 +54,10 @@ export class AuthService {
     })
 
     if (!user || !this.validatePassword(password, user.password)) {
+      const message = 'Wrong email or password'
+
       throw new HttpException(
-        { message: 'Wrong email or password' },
+        { message, errors: message },
         HttpStatus.UNAUTHORIZED,
       )
     }
@@ -72,7 +76,10 @@ export class AuthService {
         message = e.message
       }
 
-      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        { message, errors: message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 

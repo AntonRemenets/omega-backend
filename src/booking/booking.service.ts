@@ -21,16 +21,17 @@ export class BookingService {
     })
 
     if (!userCandidate || !eventCandidate) {
+      const message = 'Wrong event or user'
+
       throw new HttpException(
-        { message: 'Wrong event or user' },
+        { message, errors: message },
         HttpStatus.NOT_FOUND,
       )
     }
     if (bookingCheck) {
-      throw new HttpException(
-        { message: 'User already booked this event' },
-        HttpStatus.CONFLICT,
-      )
+      const message = 'User already booked this event'
+
+      throw new HttpException({ message, errors: message }, HttpStatus.CONFLICT)
     }
 
     try {
@@ -53,7 +54,10 @@ export class BookingService {
         message = e.message
       }
 
-      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        { message, errors: message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 
@@ -75,7 +79,10 @@ export class BookingService {
         message = e.message
       }
 
-      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        { message, errors: message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 
@@ -93,7 +100,10 @@ export class BookingService {
         message = e.message
       }
 
-      throw new HttpException({ message }, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        { message, errors: message },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      )
     }
   }
 }

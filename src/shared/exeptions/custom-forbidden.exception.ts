@@ -4,7 +4,8 @@ import { IResponse } from '../interfaces'
 export class CustomForbiddenException extends HttpException {
   constructor(message: string = 'Forbidden: Insufficient permissions') {
     const response: IResponse = {
-      message: message,
+      message,
+      errors: [message],
     }
     super(response, HttpStatus.FORBIDDEN)
   }
